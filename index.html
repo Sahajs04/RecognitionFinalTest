@@ -143,13 +143,6 @@
             grid-column: span 3;
         }
     </style>
-    <!-- Supabase Client Library -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@1.29.5/dist/umd/supabase.min.js"></script>
-    <script>
-      const supabaseUrl = 'https://vrszetgxfqizfjbrtscw.supabase.co';
-      const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZyc3pldGd4ZnFpemZqYnJ0c2N3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjI0MzM3NTksImV4cCI6MjAzODAwOTc1OX0.LSbGcs2UieCXM_pPoXiDLC_gBXxyno7W-8q85mRBDh8'; // Replace with your public key
-      const supabase = supabase.createClient(supabaseUrl, supabaseKey);
-    </script>
 </head>
 <body>
     <div class="menu-icon" onclick="toggleMenu()">☰</div>
@@ -163,6 +156,10 @@
     <div class="recognition-container" id="recognitionContainer"></div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script>
+        const supabaseUrl = 'https://vrszetgxfqizfjbrtscw.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZyc3pldGd4ZnFpemZqYnJ0c2N3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjI0MzM3NTksImV4cCI6MjAzODAwOTc1OX0.LSbGcs2UieCXM_pPoXiDLC_gBXxyno7W-8q85mRBDh8'; // Replace with your public key
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
         const requiredColumns = ['ID', 'Please describe why they deserve recognition', 'Your name', 'Who are you recognizing?'];
         let nameToImageMap = {};
         const personIcon = 'data:image/png;base64,YOUR_BASE64_IMAGE_HERE'; // Replace with your base64 person icon
@@ -257,4 +254,65 @@
                     const recognizerName = row[headers.indexOf('Your name')];
                     const recognizedNamesCell = row[headers.indexOf('Who are you recognizing?')];
                     const additionalNamesCell = row[headers.indexOf('If not on the list, please write their name(s) here')];
-                    const recognizedNames = recognizedNamesCell ? recognizedNamesCell.split(';').map(name => name.trim()).filter(name => name && name !== 'Other')
+                    const recognizedNames = recognizedNamesCell ? recognizedNamesCell.split(';').map(name => name.trim()).filter(name => name && name !== 'Other') : [];
+                    const additionalNames = additionalNamesCell ? additionalNamesCell.split(';').map(name => name.trim()).filter(name => name) : [];
+
+                    console.log(`Row ${index + 1} - ID: ${id}, Recognizer: ${recognizerName}, Recognition Text: ${recognitionText}`);
+                    console.log(`Row ${index + 1} - Recognized Names: ${recognizedNames}, Additional Names: ${additionalNames}`);
+
+                    const recognitionItem = document.createElement('div');
+                    recognitionItem.className = 'recognition-item';
+
+                    const imageContainer = document.createElement('div');
+                    imageContainer.className = 'recognition-images';
+
+                    const namesContainer = document.createElement('div');
+                    namesContainer.className = 'recognition-names';
+                    namesContainer.innerText = recognizedNames.concat(additionalNames).join(', ');
+
+                    recognizedNames.forEach(name => {
+                        if (nameToImageMap[name]) {
+                            const img = document.createElement('img');
+                            img.src = `${nameToImageMap[name]}`;
+                            imageContainer.appendChild(img);
+                        }
+                    });
+
+                    additionalNames.forEach(name => {
+                        const img = document.createElement('img');
+                        img.src = personIcon;
+                        imageContainer.appendChild(img);
+                    });
+
+                    recognitionItem.appendChild(imageContainer);
+                    recognitionItem.appendChild(namesContainer);
+
+                    const textDiv = document.createElement('div');
+                    textDiv.className = 'recognition-text';
+                    textDiv.innerText = `${recognitionText}\n~ ${recognizerName}`;
+                    recognitionItem.appendChild(textDiv);
+
+                    recognitionContainer.appendChild(recognitionItem);
+
+                    console.log(`Processed row ${index + 1} successfully`);
+                } catch (error) {
+                    console.error(`Error processing row ${index + 1}:`, error);
+                }
+            });
+        }
+
+        window.onclick = function(event) {
+            if (!event.target.matches('.menu-icon')) {
+                const dropdowns = document.getElementsByClassName("dropdown-menu");
+                for (let i = 0; i < dropdowns.length; i++) {
+                    const openDropdown = dropdowns[i];
+                    if (openDropdown.style.display === 'block') {
+                        openDropdown.style.display = 'none';
+                    }
+                }
+            }
+        }
+    </script>
+    <img src="https://stepstocuresarcoma.com/wp-content/uploads/2017/04/logo-stryker-no-background-gif.png" class="top-right-logo" />
+</body>
+</html>
