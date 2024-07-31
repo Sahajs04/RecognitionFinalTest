@@ -23,7 +23,7 @@ async function fetchNamesAndImages() {
     for (const key in data) {
         if (data.hasOwnProperty(key)) {
             const entry = data[key];
-            nameToImageMap[entry.Name] = `data:image/png;base64,${entry.Base64}`;
+            nameToImageMap[entry.Name] = `data:image/jpeg;base64,${entry.Base64}`;
         }
     }
 }
