@@ -1,5 +1,6 @@
-import { collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js';
-import { db } from './index.html'; // Ensure the path matches where you initialize Firestore
+import { getDatabase } from "firebase/database";
+const database = getDatabase();
+
 
 const requiredColumns = ['ID', 'Please describe why they deserve recognition', 'Your name', 'Who are you recognizing?'];
 let nameToImageMap = {};
