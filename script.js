@@ -58,16 +58,20 @@ async function handleFile(e) {
       console.log('First sheet name:', firstSheetName);
       const worksheet = workbook.Sheets[firstSheetName];
       const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+      /*
       if (!validateColumns(jsonData[0])) {
         showWarning('The Excel file does not have the required columns.');
         return;
       }
       hideWarning();
+      */
       generateRecognitionItems(jsonData);
+      /*
     } catch (error) {
       console.error('Error reading the Excel file:', error);
       showWarning('Error reading the Excel file. Please ensure it is a valid Excel file.');
     }
+    */
   };
   reader.readAsArrayBuffer(file);
 }
