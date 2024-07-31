@@ -3,15 +3,14 @@ import { getDatabase, ref, get, child } from 'https://www.gstatic.com/firebasejs
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_AUTH_DOMAIN",
-    databaseURL: "YOUR_DATABASE_URL",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_STORAGE_BUCKET",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
-};
-
+            apiKey: "AIzaSyDqF_g4kvf2hhJQ_SB_tP0f3rYVla-MIlA",
+            authDomain: "recognition-52d3a.firebaseapp.com",
+            databaseURL: "https://recognition-52d3a-default-rtdb.firebaseio.com",
+            projectId: "recognition-52d3a",
+            storageBucket: "recognition-52d3a.appspot.com",
+            messagingSenderId: "844156316363",
+            appId: "1:844156316363:web:75dc9cf291aaac8537494e"
+        };
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
