@@ -1,8 +1,8 @@
-// Import the Supabase client library from a CDN
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+import { createClient } from '@supabase/supabase-js'
 
-// Create a single supabase client for interacting with your database
-const supabase = createClient('https://vrszetgxfqizfjbrtscw.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZyc3pldGd4ZnFpemZqYnJ0c2N3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjI0MzM3NTksImV4cCI6MjAzODAwOTc1OX0.LSbGcs2UieCXM_pPoXiDLC_gBXxyno7W-8q85mRBDh8');
+const supabaseUrl = 'https://vrszetgxfqizfjbrtscw.supabase.co'
+const supabaseKey = process.env.SUPABASE_KEY
+const supabase = createClient(supabaseUrl, supabaseKey)
 
 const requiredColumns = ['ID', 'Please describe why they deserve recognition', 'Your name', 'Who are you recognizing?'];
 let nameToImageMap = {};
