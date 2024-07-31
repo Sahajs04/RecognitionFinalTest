@@ -1,7 +1,5 @@
-import { createClient } from '@supabase/supabase-js';
-const supabaseUrl = 'https://vrszetgxfqizfjbrtscw.supabase.co'
-const supabaseKey = process.env.SUPABASE_KEY
-const supabase = createClient(supabaseUrl, supabaseKey)
+import { collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js';
+import { db } from './index.html'; // Import the Firestore instance from your HTML
 
 const requiredColumns = ['ID', 'Please describe why they deserve recognition', 'Your name', 'Who are you recognizing?'];
 let nameToImageMap = {};
@@ -11,20 +9,13 @@ document.getElementById('fileInput').addEventListener('change', handleFile, fals
 
 async function fetchNamesAndImages() {
     try {
-        const { data, error } = await supabase
-            .from('Recognition Pictures') // replace with your table name
-            .select('Name, Base64');
-        
-        if (error) {
-            console.error('Error fetching data from Supabase:', error);
-            return;
-        }
-        
-        data.forEach(row => {
-            nameToImageMap[row.name] = `data:image/png;base64,${row.image_base64}`;
+        const querySnapshot = await getDocs(collection(db, 'Recognition Pictures')); // replace with your collection name
+        querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            nameToImageMap[data.Name] = `data:image/png;base64,${data.Base64}`;
         });
     } catch (error) {
-        console.error('Unexpected error fetching names and images:', error);
+        console.error('Error fetching data from Firestore:', error);
     }
 }
 
@@ -40,11 +31,101 @@ async function handleFile(e) {
         showWarning('Please select a valid Excel file.');
         return;
     }
-    // Add your file handling logic here
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        try {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const firstSheetName = workbook.SheetNames[0];
+            console.log('First sheet name:', firstSheetName);
+            const worksheet = workbook.Sheets[firstSheetName];
+            const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+            if (!validateColumns(jsonData[0])) {
+                showWarning('The Excel file does not have the required columns.');
+                return;
+            }
+            hideWarning();
+            generateRecognitionItems(jsonData);
+        } catch (error) {
+            console.error('Error reading the Excel file:', error);
+            showWarning('Error reading the Excel file. Please ensure it is a valid Excel file.');
+        }
+    };
+    reader.readAsArrayBuffer(file);
+}
+
+function toggleMenu() {
+    const menu = document.getElementById('dropdownMenu');
+    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+}
+
+function validateColumns(columns) {
+    const cleanedColumns = columns.map(col => col.replace(/[\n\r]/g, ''));
+    const missingColumns = requiredColumns.filter(col => !cleanedColumns.includes(col));
+    if (missingColumns.length > 0) {
+        console.error('Missing columns:', missingColumns);
+        return false;
+    }
+    return true;
 }
 
 function showWarning(message) {
     const warningMessage = document.getElementById('warningMessage');
     warningMessage.textContent = message;
     warningMessage.style.display = 'block';
+}
+
+function hideWarning() {
+    const warningMessage = document.getElementById('warningMessage');
+    warningMessage.style.display = 'none';
+}
+
+function generateRecognitionItems(data) {
+    const recognitionContainer = document.getElementById('recognitionContainer');
+    recognitionContainer.innerHTML = '';
+    const headers = data[0].map(header => header.trim());
+    console.log('Headers:', headers);
+    const rows = data.slice(1);
+    rows.forEach((row, index) => {
+        try {
+            const id = row[headers.indexOf('ID')];
+            const recognitionText = row[headers.indexOf('Please describe why they deserve recognition')];
+            const recognizerName = row[headers.indexOf('Your name')];
+            const recognizedNamesCell = row[headers.indexOf('Who are you recognizing?')];
+            const additionalNamesCell = row[headers.indexOf('If not on the list, please write their name(s) here')];
+            const recognizedNames = recognizedNamesCell ? recognizedNamesCell.split(';').map(name => name.trim()).filter(name => name && name !== 'Other') : [];
+            const additionalNames = additionalNamesCell ? additionalNamesCell.split(';').map(name => name.trim()).filter(name => name) : [];
+            console.log(`Row ${index + 1} - ID: ${id}, Recognizer: ${recognizerName}, Recognition Text: ${recognitionText}`);
+            console.log(`Row ${index + 1} - Recognized Names: ${recognizedNames}, Additional Names: ${additionalNames}`);
+            const recognitionItem = document.createElement('div');
+            recognitionItem.className = 'recognition-item';
+            const imageContainer = document.createElement('div');
+            imageContainer.className = 'recognition-images';
+            const namesContainer = document.createElement('div');
+            namesContainer.className = 'recognition-names';
+            namesContainer.innerText = recognizedNames.concat(additionalNames).join(', ');
+            recognizedNames.forEach(name => {
+                if (nameToImageMap[name]) {
+                    const img = document.createElement('img');
+                    img.src = `${nameToImageMap[name]}`;
+                    imageContainer.appendChild(img);
+                }
+            });
+            additionalNames.forEach(name => {
+                const img = document.createElement('img');
+                img.src = personIcon;
+                imageContainer.appendChild(img);
+            });
+            recognitionItem.appendChild(imageContainer);
+            recognitionItem.appendChild(namesContainer);
+            const textDiv = document.createElement('div');
+            textDiv.className = 'recognition-text';
+            textDiv.innerText = `${recognitionText}\n~ ${recognizerName}`;
+            recognitionItem.appendChild(textDiv);
+            recognitionContainer.appendChild(recognitionItem);
+            console.log(`Processed row ${index + 1} successfully`);
+        } catch (error) {
+            console.error(`Error processing row ${index + 1}:`, error);
+        }
+    });
 }
