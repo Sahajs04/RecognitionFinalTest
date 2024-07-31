@@ -144,9 +144,9 @@
         }
     </style>
     <!-- Firebase App (the core Firebase SDK) -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js"></script>
     <!-- Firebase Database SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-database.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.12.4/firebase-database.js"></script>
 </head>
 <body>
     
@@ -161,7 +161,7 @@
     <div class="recognition-container" id="recognitionContainer"></div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script>
+    <script type="module">
         // Your web app's Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyDqF_g4kvf2hhJQ_SB_tP0f3rYVla-MIlA",
@@ -174,13 +174,15 @@
         };
 
         // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js';
+        import { getDatabase, ref, get, child } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-database.js';
 
-        // Get a reference to the database
-        const db = firebase.database();
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
 
         async function fetchNamesAndImages() {
-            const snapshot = await db.ref('Recognition Pictures').once('value');
+            const dbRef = ref(db);
+            const snapshot = await get(child(dbRef, 'Recognition Pictures'));
             const data = snapshot.val();
             for (const key in data) {
                 if (data.hasOwnProperty(key)) {
