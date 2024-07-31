@@ -121,6 +121,8 @@
             z-index: 1;
             border-radius: 5px;
             transition: background-color 0.3s ease, color 0.3s ease;
+            padding: 10px;
+            width: 300px;
         }
         .dropdown-menu a {
             display: block;
@@ -130,6 +132,13 @@
         }
         .dropdown-menu a:hover {
             background-color: #f0f0f0;
+        }
+        .dropdown-menu form {
+            display: flex;
+            flex-direction: column;
+        }
+        .dropdown-menu form input, .dropdown-menu form button {
+            margin: 5px 0;
         }
         .warning-message {
             color: red;
@@ -149,6 +158,15 @@
     <div class="menu-icon" onclick="toggleMenu()">☰</div>
     <div class="dropdown-menu" id="dropdownMenu">
         <a href="https://stryker-my.sharepoint.com/:w:/p/sahaj_singh/ESZHHxOY3plBkhR359zUaGwBpwFO5029MCUuP0QRYts2NA?e=gKrRyz" target="_blank" class="top-left-link">Guidance Document</a>
+        <form id="addPersonForm">
+            <h3>Add/Remove Person</h3>
+            <label for="personName">Name:</label>
+            <input type="text" id="personName" required>
+            <label for="personImage">Base64 Image:</label>
+            <input type="text" id="personImage" required>
+            <button type="button" onclick="addPerson()">Add</button>
+            <button type="button" onclick="removePerson()">Remove</button>
+        </form>
     </div>
     <h1><span style="color: rgb(255, 181, 0);">Recognition- </span> Words From One Another</h1>
     <label for="fileInput" class="choose-file">Choose File</label>
