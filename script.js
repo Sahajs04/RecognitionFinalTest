@@ -200,3 +200,8 @@ async function removePerson() {
         console.error('Error removing person:', error);
     }
 }
+
+// Exporting functions to be globally accessible
+window.toggleMenu = toggleMenu;
+window.addPerson = addPerson;
+window.removePerson = removePerson;
