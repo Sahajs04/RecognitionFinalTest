@@ -1,5 +1,5 @@
 import { collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js';
-import { db } from './index.html'; // Import the Firestore instance from your HTML
+import { db } from './index.html'; // Ensure the path matches where you initialize Firestore
 
 const requiredColumns = ['ID', 'Please describe why they deserve recognition', 'Your name', 'Who are you recognizing?'];
 let nameToImageMap = {};
@@ -9,7 +9,7 @@ document.getElementById('fileInput').addEventListener('change', handleFile, fals
 
 async function fetchNamesAndImages() {
     try {
-        const querySnapshot = await getDocs(collection(db, 'Recognition Pictures')); // replace with your collection name
+        const querySnapshot = await getDocs(collection(db, 'RecognitionPictures')); // replace with your collection name
         querySnapshot.forEach((doc) => {
             const data = doc.data();
             nameToImageMap[data.Name] = `data:image/png;base64,${data.Base64}`;
