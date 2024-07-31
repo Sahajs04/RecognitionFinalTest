@@ -1,16 +1,17 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js';
-import { getDatabase, ref, get, child } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-database.js';
+import { getDatabase, ref, get, set, remove } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-database.js';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-            apiKey: "AIzaSyDqF_g4kvf2hhJQ_SB_tP0f3rYVla-MIlA",
-            authDomain: "recognition-52d3a.firebaseapp.com",
-            databaseURL: "https://recognition-52d3a-default-rtdb.firebaseio.com",
-            projectId: "recognition-52d3a",
-            storageBucket: "recognition-52d3a.appspot.com",
-            messagingSenderId: "844156316363",
-            appId: "1:844156316363:web:75dc9cf291aaac8537494e"
-        };
+    apiKey: "AIzaSyDqF_g4kvf2hhJQ_SB_tP0f3rYVla-MIlA",
+    authDomain: "recognition-52d3a.firebaseapp.com",
+    databaseURL: "https://recognition-52d3a-default-rtdb.firebaseio.com",
+    projectId: "recognition-52d3a",
+    storageBucket: "recognition-52d3a.appspot.com",
+    messagingSenderId: "844156316363",
+    appId: "1:844156316363:web:75dc9cf291aaac8537494e"
+};
+
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
@@ -31,8 +32,7 @@ async function fetchNamesAndImages() {
 
 const requiredColumns = ['ID', 'Please describe why they deserve recognition', 'Your name', 'Who are you recognizing?'];
 let nameToImageMap = {};
-const personIcon = "";
-; // Replace with your base64 person icon
+const personIcon = 'data:image/png;base64,YOUR_BASE64_IMAGE_HERE'; // Replace with your base64 person icon
 
 document.getElementById('fileInput').addEventListener('change', handleFile, false);
 
@@ -156,5 +156,47 @@ window.onclick = function(event) {
                 openDropdown.style.display = 'none';
             }
         }
+    }
+}
+
+async function addPerson() {
+    const personName = document.getElementById('personName').value.trim();
+    const personImage = document.getElementById('personImage').value.trim();
+
+    if (!personName || !personImage) {
+        showWarning('Please provide both name and base64 image.');
+        return;
+    }
+
+    try {
+        const dbRef = ref(db, `Recognition Pictures/${personName}`);
+        await set(dbRef, {
+            Name: personName,
+            Base64: personImage
+        });
+        showWarning('Person added successfully!');
+        fetchNamesAndImages();  // Refresh the name to image map
+    } catch (error) {
+        showWarning('Error adding person. Please try again.');
+        console.error('Error adding person:', error);
+    }
+}
+
+async function removePerson() {
+    const personName = document.getElementById('personName').value.trim();
+
+    if (!personName) {
+        showWarning('Please provide the name of the person to remove.');
+        return;
+    }
+
+    try {
+        const dbRef = ref(db, `Recognition Pictures/${personName}`);
+        await remove(dbRef);
+        showWarning('Person removed successfully!');
+        fetchNamesAndImages();  // Refresh the name to image map
+    } catch (error) {
+        showWarning('Error removing person. Please try again.');
+        console.error('Error removing person:', error);
     }
 }
